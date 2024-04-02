@@ -963,9 +963,9 @@ void _VulkanRenderer_Impl::createGraphicsPipelines()
 			depth_pipeline_info.flags = VK_PIPELINE_CREATE_DERIVATIVE_BIT;
 
 			depth_pipeline = VRaii<vk::Pipeline>(
-				device.createGraphicsPipeline(vk::PipelineCache(), depth_pipeline_info, nullptr),
+				device.createGraphicsPipeline(vk::PipelineCache(), depth_pipeline_info, nullptr).value,
 				raii_pipeline_deleter
-				);
+			);
 		}
 	}
 }
