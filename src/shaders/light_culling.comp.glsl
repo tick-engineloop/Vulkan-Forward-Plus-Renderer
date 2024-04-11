@@ -92,10 +92,13 @@ ViewFrustum createFrustum(ivec2 tile_id)
 	vec3 temp_normal;
 	for (int i = 0; i < 4; i++)
 	{
-		//Cax+Cby+Ccz+Cd = 0, planes[i] = (Ca, Cb, Cc, Cd)
-		// temp_normal: normal without normalization
+		// Cax+Cby+Ccz+Cd = 0, planes[i] = (Ca, Cb, Cc, Cd)
+		// 视锥体近平面四边形的两个相邻顶点可以和摄像机位置点形成视锥体的一个平面
+		// 可以利用这两个顶点分别和摄像机位置点构成的向量求叉积获得该平面的法向量
 		temp_normal = cross(frustum.points[i] - camera.cam_pos, frustum.points[i + 1] - camera.cam_pos);
+		// 对求得的法向量归一化后得到平面方程中的 Ca, Cb, Cc
 		temp_normal = normalize(temp_normal);
+		// 由点法式平面方程的公式可知，Cd 可以通过法向量和平面中一点的点积求得
 		frustum.planes[i] = vec4(temp_normal, - dot(temp_normal, frustum.points[i]));
 	}
 	// near plane
