@@ -17,7 +17,7 @@ const bool ENABLE_VALIDATION_LAYERS = false;
 const bool ENABLE_VALIDATION_LAYERS = true;
 #endif
 
-// #define ONE_QUEUE // Force one queue for everything
+#define ONE_QUEUE // Force one queue for everything
 
 const std::vector<const char*> VALIDATION_LAYERS = {
 	"VK_LAYER_KHRONOS_validation"

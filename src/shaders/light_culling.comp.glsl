@@ -53,8 +53,8 @@ const float ndc_far_plane = 1.0;
 
 struct ViewFrustum
 {
-	vec4 planes[6];
-	vec3 points[8]; // 0-3 near 4-7 far
+	vec4 planes[6];	// frustum plane array
+	vec3 points[8]; // frustum vertex array, 0-3 near 4-7 far
 };
 
 layout(local_size_x = 32) in;
@@ -181,6 +181,12 @@ void main()
 
 	barrier();
 
+	// 每个瓦片对应的子视椎体都要遍历所有光源判断是否在其体内，所以每个工作组都要对所有光源进行剔除计算。
+	// 因为工作组被定义为长度为32的一维工作组，所以一个工作组一次同时处理连续的32个光源：
+	// 0号工作项调用从光源0开始处理，处理完光源0后，0号工作项调用处理光源32，接着处理光源64，…，直到处理到最大光源数或瓦片允许的最大光源数为止；
+	// 1号工作项调用从光源1开始处理，处理完光源1后，1号工作项调用处理光源33，接着处理光源65，…，直到处理到最大光源数或瓦片允许的最大光源数为止；
+	// ……
+	// 31号工作项调用从光源31开始处理，处理完光源31后，31号工作项调用处理光源63，接着处理光源95，…，直到处理到最大光源数或瓦片允许的最大光源数为止。
 	for (uint i = gl_LocalInvocationIndex; i < light_num && light_count_for_tile < MAX_POINT_LIGHT_PER_TILE; i += gl_WorkGroupSize.x)
 	{
 		if (isCollided(pointlights[i], frustum))
