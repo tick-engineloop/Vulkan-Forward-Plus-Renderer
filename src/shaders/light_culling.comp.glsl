@@ -76,7 +76,7 @@ ViewFrustum createFrustum(ivec2 tile_id)
 
 	vec2 ndc_size_per_tile = 2.0 * vec2(TILE_SIZE, TILE_SIZE) / push_constants.viewport_size;
 
-	// 求出视锥体近平面四边形四个顶点的 NDC 坐标
+	// 求出子视锥体近平面四边形四个顶点的 NDC 坐标
 	vec2 ndc_pts[4];  // corners of tile in ndc
 	ndc_pts[0] = ndc_upper_left + tile_id * ndc_size_per_tile;				// upper left
 	ndc_pts[1] = vec2(ndc_pts[0].x + ndc_size_per_tile.x, ndc_pts[0].y);	// upper right
@@ -87,7 +87,7 @@ ViewFrustum createFrustum(ivec2 tile_id)
 	vec3 temp_normal;
 	ViewFrustum frustum;
 
-	// 使用视图投影逆矩阵，乘以视锥体近平面四边形四个顶点的 NDC 坐标，将他们变换到世界空间
+	// 使用视图投影逆矩阵，乘以子视锥体近平面四边形四个顶点的 NDC 坐标，将他们变换到世界空间
 	for (int i = 0; i < 4; i++)
 	{
 		temp = inv_projview * vec4(ndc_pts[i], min_depth, 1.0);
@@ -96,11 +96,11 @@ ViewFrustum createFrustum(ivec2 tile_id)
 		frustum.points[i + 4] = temp.xyz / temp.w;
 	}
 
-	// 由于摄像机位置向量也是世界空间的，所以可以求出视锥体在世界空间中上下左右四个平面的参数
+	// 由于摄像机位置向量也是世界空间的，所以可以求出子视锥体在世界空间中上下左右四个平面的参数
 	for (int i = 0; i < 4; i++)
 	{
 		// Cax+Cby+Ccz+Cd = 0, planes[i] = (Ca, Cb, Cc, Cd)
-		// 视锥体近平面四边形的两个相邻顶点可以和摄像机位置点形成视锥体的一个平面
+		// 子视锥体近平面四边形的两个相邻顶点可以和摄像机位置点形成子视锥体的一个平面
 		// 可以利用这两个顶点分别和摄像机位置点构成的向量求叉积获得该平面的法向量
 		temp_normal = cross(frustum.points[i] - camera.cam_pos, frustum.points[i + 1] - camera.cam_pos);
 		// 对求得的法向量归一化后得到平面方程中的 Ca, Cb, Cc
