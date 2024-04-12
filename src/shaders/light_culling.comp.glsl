@@ -71,20 +71,23 @@ shared float max_depth;
 // Construct view frustum
 ViewFrustum createFrustum(ivec2 tile_id)
 {
-
+	// 视图投影逆矩阵
 	mat4 inv_projview = inverse(camera.projview);
 
 	vec2 ndc_size_per_tile = 2.0 * vec2(TILE_SIZE, TILE_SIZE) / push_constants.viewport_size;
 
+	// 求出视锥体近平面四边形四个顶点的 NDC 坐标
 	vec2 ndc_pts[4];  // corners of tile in ndc
-	ndc_pts[0] = ndc_upper_left + tile_id * ndc_size_per_tile;  // upper left
-	ndc_pts[1] = vec2(ndc_pts[0].x + ndc_size_per_tile.x, ndc_pts[0].y); // upper right
-	ndc_pts[2] = ndc_pts[0] + ndc_size_per_tile;
-	ndc_pts[3] = vec2(ndc_pts[0].x, ndc_pts[0].y + ndc_size_per_tile.y); // lower left
-
-	ViewFrustum frustum;
+	ndc_pts[0] = ndc_upper_left + tile_id * ndc_size_per_tile;				// upper left
+	ndc_pts[1] = vec2(ndc_pts[0].x + ndc_size_per_tile.x, ndc_pts[0].y);	// upper right
+	ndc_pts[2] = ndc_pts[0] + ndc_size_per_tile;							// lower right
+	ndc_pts[3] = vec2(ndc_pts[0].x, ndc_pts[0].y + ndc_size_per_tile.y);	// lower left
 
 	vec4 temp;
+	vec3 temp_normal;
+	ViewFrustum frustum;
+
+	// 使用视图投影逆矩阵，乘以视锥体近平面四边形四个顶点的 NDC 坐标，将他们变换到世界空间
 	for (int i = 0; i < 4; i++)
 	{
 		temp = inv_projview * vec4(ndc_pts[i], min_depth, 1.0);
@@ -93,7 +96,7 @@ ViewFrustum createFrustum(ivec2 tile_id)
 		frustum.points[i + 4] = temp.xyz / temp.w;
 	}
 
-	vec3 temp_normal;
+	// 由于摄像机位置向量也是世界空间的，所以可以求出视锥体在世界空间中上下左右四个平面的参数
 	for (int i = 0; i < 4; i++)
 	{
 		// Cax+Cby+Ccz+Cd = 0, planes[i] = (Ca, Cb, Cc, Cd)
