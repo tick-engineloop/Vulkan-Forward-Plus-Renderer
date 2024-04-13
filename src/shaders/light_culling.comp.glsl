@@ -88,6 +88,13 @@ ViewFrustum createFrustum(ivec2 tile_id)
 	ViewFrustum frustum;
 
 	// 使用视图投影逆矩阵，乘以子视锥体近平面四边形四个顶点的 NDC 坐标，将他们变换到世界空间
+	// =================================================================================================================================
+	// 因为 V_clip = M_projection ⋅ M_view ⋅ M_model ⋅ V_local，所以给其两边乘以视图投影逆矩阵，可得：
+	// 	   ---> inverse(M_projection ⋅ M_view) ⋅ V_clip = inverse(M_projection ⋅ M_view) ⋅ (M_projection ⋅ M_view) ⋅ M_model ⋅ V_local
+	//	   ---> inverse(M_projection ⋅ M_view) ⋅ V_clip = I ⋅ M_model ⋅ V_local
+	//	   ---> inverse(M_projection ⋅ M_view) ⋅ V_clip = M_model ⋅ V_local
+	// 这样就变换回到世界空间中了
+	// =================================================================================================================================
 	for (int i = 0; i < 4; i++)
 	{
 		temp = inv_projview * vec4(ndc_pts[i], min_depth, 1.0);
