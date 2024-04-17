@@ -48,7 +48,7 @@ layout(set = 2, binding = 0) uniform sampler2D depth_sampler;
 
 // OpenGL 的 NDC 坐标系默认是左手坐标系，其原点位于屏幕正中间，X 轴向右，Y 轴向上，Z 轴朝屏幕内。(-1,-1)在左下角。
 // Vulkan 的 NDC 坐标系默认是右手坐标系，其原点位于屏幕正中间，X 轴向右，Y 轴向下，Z 轴朝屏幕内。(-1,-1)在左上角。
-// 裁切坐标中 XYZ 的值范围位于 [-1, 1] 之间，变换到归一化设备坐标中 XY 映射到 [-1, 1] 之间，Z 映射到 [0, 1]之间。近处值小，远处值大。
+// 裁剪坐标变换到归一化设备坐标中 XY 映射到 [-1, 1] 之间，Z 映射到 [0, 1]之间。近处值小，远处值大。
 // 世界空间和观察空间按惯例通常使用右手坐标系，X 轴向右，Y 轴向上，Z 轴朝屏幕外。当然，不论是世界空间和观察空间还是 NDC，可使用的坐标系规则都不是固定的，可以通过变换来改变
 // vulkan ndc, minDepth = 0.0, maxDepth = 1.0
 const vec2 ndc_upper_left = vec2(-1.0, -1.0);
@@ -87,14 +87,7 @@ ViewFrustum createFrustum(ivec2 tile_id)
 	vec3 temp_normal;
 	ViewFrustum frustum;
 
-	// 使用视图投影逆矩阵，乘以子视锥体近平面四边形四个顶点的 NDC 坐标，将他们变换到世界空间
-	// =================================================================================================================================
-	// 因为 V_clip = M_projection ⋅ M_view ⋅ M_model ⋅ V_local，所以给其两边乘以视图投影逆矩阵，可得：
-	// 	   ---> inverse(M_projection ⋅ M_view) ⋅ V_clip = inverse(M_projection ⋅ M_view) ⋅ (M_projection ⋅ M_view) ⋅ M_model ⋅ V_local
-	//	   ---> inverse(M_projection ⋅ M_view) ⋅ V_clip = I ⋅ M_model ⋅ V_local
-	//	   ---> inverse(M_projection ⋅ M_view) ⋅ V_clip = M_model ⋅ V_local
-	// 这样就变换回到世界空间中了
-	// =================================================================================================================================
+	// 使用视图投影逆矩阵，乘以子视锥体近平面四边形四个顶点的 NDC 坐标，再除以其结果的 w 分量，将 NDC 坐标变换到世界空间
 	for (int i = 0; i < 4; i++)
 	{
 		temp = inv_projview * vec4(ndc_pts[i], min_depth, 1.0);
