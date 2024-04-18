@@ -74,11 +74,11 @@ ViewFrustum createFrustum(ivec2 tile_id)
 	// 视图投影逆矩阵
 	mat4 inv_projview = inverse(camera.projview);
 
-	// 归一化的视口XY坐标范围是 [0.0, 1.0]，标准化设备XY坐标范围是 [-1, 1]
+	// 归一化的视口XY坐标范围是 [0.0, 1.0]，宽度是 1；标准化设备XY坐标范围是 [-1, 1]，宽度是 2
 	// 首先通过 vec2(TILE_SIZE, TILE_SIZE) / push_constants.viewport_size 得到瓦片在归一化的视口中的大小，然后将其结果乘以 2 得到瓦片在标准化设备中的大小
 	vec2 ndc_size_per_tile = 2.0 * vec2(TILE_SIZE, TILE_SIZE) / push_constants.viewport_size;
 
-	// 求出子视锥体近平面四边形四个顶点的 NDC 坐标
+	// 求出子视锥体近平面四边形四个顶点的 NDC 坐标 XY 值
 	vec2 ndc_pts[4];  // corners of tile in ndc
 	ndc_pts[0] = ndc_upper_left + tile_id * ndc_size_per_tile;				// upper left
 	ndc_pts[1] = vec2(ndc_pts[0].x + ndc_size_per_tile.x, ndc_pts[0].y);	// upper right
