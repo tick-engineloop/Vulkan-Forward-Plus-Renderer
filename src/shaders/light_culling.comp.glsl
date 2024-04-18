@@ -74,6 +74,8 @@ ViewFrustum createFrustum(ivec2 tile_id)
 	// 视图投影逆矩阵
 	mat4 inv_projview = inverse(camera.projview);
 
+	// 归一化的视口XY坐标范围是 [0.0, 1.0]，标准化设备XY坐标范围是 [-1, 1]
+	// 首先通过 vec2(TILE_SIZE, TILE_SIZE) / push_constants.viewport_size 得到瓦片在归一化的视口中的大小，然后将其结果乘以 2 得到瓦片在标准化设备中的大小
 	vec2 ndc_size_per_tile = 2.0 * vec2(TILE_SIZE, TILE_SIZE) / push_constants.viewport_size;
 
 	// 求出子视锥体近平面四边形四个顶点的 NDC 坐标
@@ -87,7 +89,7 @@ ViewFrustum createFrustum(ivec2 tile_id)
 	vec3 temp_normal;
 	ViewFrustum frustum;
 
-	// 使用视图投影逆矩阵，乘以子视锥体近平面四边形四个顶点的 NDC 坐标，再除以其结果的 w 分量，将 NDC 坐标变换到世界空间
+	// 使用视图投影逆矩阵，乘以子视锥体近平面顶点的 NDC 坐标，再除以其结果的 w 分量，将 NDC 坐标变换到世界空间
 	for (int i = 0; i < 4; i++)
 	{
 		temp = inv_projview * vec4(ndc_pts[i], min_depth, 1.0);
