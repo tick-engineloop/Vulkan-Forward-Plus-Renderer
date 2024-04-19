@@ -79,6 +79,19 @@ ViewFrustum createFrustum(ivec2 tile_id)
 	vec2 ndc_size_per_tile = 2.0 * vec2(TILE_SIZE, TILE_SIZE) / push_constants.viewport_size;
 
 	// 求出子视锥体近平面四边形四个顶点的 NDC 坐标 XY 值
+	//================================================
+	// NDC 坐标空间：
+	//						||
+	// (-1, -1)	* ——————————————————————
+	//			|			||			|
+	// 			|			||			|
+	//		 ---|-----------||----------|---> x
+	//			|			||			|
+	//			|			||			|
+	//			 ———————————||———————————
+	//					    ||
+	//					    \/ y		 
+	//=================================================
 	vec2 ndc_pts[4];  // corners of tile in ndc
 	ndc_pts[0] = ndc_upper_left + tile_id * ndc_size_per_tile;				// upper left
 	ndc_pts[1] = vec2(ndc_pts[0].x + ndc_size_per_tile.x, ndc_pts[0].y);	// upper right
@@ -131,6 +144,7 @@ bool isCollided(PointLight light, ViewFrustum frustum)
 	bool result = true;
 
     // Step1: sphere-plane test
+	// 球-平面相交判断：判断球心到平面的距离是否大于球的半径，若大于则不相交，否则相交
 	for (int i = 0; i < 6; i++)
 	{
 		if (dot(light.pos, frustum.planes[i].xyz) + frustum.planes[i].w  < - light.radius )
