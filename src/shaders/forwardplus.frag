@@ -101,8 +101,9 @@ void main()
     {
         normal = frag_normal;
     }
+
     ivec2 tile_id = ivec2(gl_FragCoord.xy / TILE_SIZE);
-    uint tile_index = tile_id.y * push_constants.tile_nums.x + tile_id.x;
+    uint tile_index = tile_id.y * push_constants.tile_nums.x + tile_id.x;   // 第几行瓦片 x 每行瓦片数量 + 该行第几个瓦片
 
     // debug view
     if (push_constants.debugview_index > 1)
@@ -154,8 +155,8 @@ void main()
 
             vec3 viewDir = normalize(camera.cam_pos - frag_pos_world);
             vec3 halfDir = normalize(light_dir + viewDir);
-            float specAngle = max(dot(halfDir, normal), 0.0);
-            float specular = pow(specAngle, 32.0);  // TODO?: spec color & power in g-buffer?
+            float spec = max(dot(halfDir, normal), 0.0);
+            float specular = pow(spec, 32.0);
 
             float att = clamp(1.0 - light_distance * light_distance / (light.radius * light.radius), 0.0, 1.0);
             illuminance += light.intensity * att * (lambertian * diffuse + specular);

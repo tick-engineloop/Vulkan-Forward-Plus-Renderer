@@ -32,14 +32,15 @@ out gl_PerVertex
 void main()
 {
     // TODO: calculate them upfront, in CPU or something
-    mat4 invtransmodel =  transpose(inverse(transform.model));
-    mat4 mvp = camera.projview * transform.model;
+    mat4 invtransmodel =  transpose(inverse(transform.model));  // 模型矩阵逆转置矩阵
+    mat4 mvp = camera.projview * transform.model;               // 模型视图投影矩阵
 
-    gl_Position = mvp * vec4(in_position, 1.0);
-    frag_color = in_color;
-    frag_tex_coord = in_tex_coord;
+    gl_Position = mvp * vec4(in_position, 1.0);                 // 顶点在裁剪空间中的坐标位置
+
+    frag_color = in_color;          // 顶点颜色向量       
+    frag_tex_coord = in_tex_coord;  // 顶点纹理坐标
 
     // TODO: do everything view or projection space
-    frag_normal = normalize((invtransmodel * vec4(in_normal, 0.0)).xyz);
-    frag_pos_world = vec3(transform.model * vec4(in_position, 1.0));
+    frag_normal = normalize((invtransmodel * vec4(in_normal, 0.0)).xyz);    // 世界空间中顶点的法向量
+    frag_pos_world = vec3(transform.model * vec4(in_position, 1.0));        // 世界空间中顶点的位置向量
 }
