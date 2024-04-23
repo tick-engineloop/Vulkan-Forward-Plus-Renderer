@@ -117,6 +117,7 @@ ViewFrustum createFrustum(ivec2 tile_id)
 		// Cax+Cby+Ccz+Cd = 0, planes[i] = (Ca, Cb, Cc, Cd)
 		// 子视锥体近平面四边形的两个相邻顶点可以和摄像机位置点形成子视锥体的一个平面
 		// 可以利用这两个顶点分别和摄像机位置点构成的向量求叉积获得该平面的法向量
+		// 根据向量叉积的规则，法向量的方向遵循右手系统，那么求得的法向量其方向指向视锥体内侧
 		temp_normal = cross(frustum.points[i] - camera.cam_pos, frustum.points[i + 1] - camera.cam_pos);
 		// 对求得的法向量归一化后得到平面方程中的 Ca, Cb, Cc
 		temp_normal = normalize(temp_normal);
@@ -145,8 +146,10 @@ bool isCollided(PointLight light, ViewFrustum frustum)
 
     // Step1: sphere-plane test
 	// 球-平面相交判断：判断球心到平面的距离是否大于球的半径，若大于则不相交，否则相交
+	// 点-平面距离：根据平面方程的海森法线形式，如果点是在平面法线指向的那一侧空间内，点面见的距离大于零；如果在另一侧那么点面距离小于零
 	for (int i = 0; i < 6; i++)
 	{
+		// 如果光源位置在视锥体平面外侧，并且距离平面大于光源半径，那么这个光源就对当前瓦片没有光照作用
 		if (dot(light.pos, frustum.planes[i].xyz) + frustum.planes[i].w  < - light.radius )
 		{
 			result = false;

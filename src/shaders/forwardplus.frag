@@ -113,14 +113,6 @@ void main()
 			//heat map debug view
 			float intensity = float(light_visiblities[tile_index].count) / 64;
             out_color = vec4(vec3(intensity), 1.0) ; //light culling debug
-			//out_color = vec4(vec3(intensity * 0.62, intensity * 0.13, intensity * 0.94), 1.0) ; //light culling debug
-			//float minimum = 0.0;
-			//float maximum = 1.0;
-			//float ratio = 2 * (intensity - minimum) / (maximum - minimum);
-			//float b = max(0, 1 - ratio);
-			//float r = max(0, ratio - 1);
-			//float g = max(0, 1.0 - b - r);
-		        //out_color = vec4(vec3(r,g,b), 1.0);
 		}
 		else if (push_constants.debugview_index == 3)
         {
@@ -173,10 +165,4 @@ void main()
 
     // render view
     out_color = vec4(illuminance, 1.0);
-
-    //out_color = vec4(0.0, 0.0, 0.0, 1.0);
-    //out_color[light_visiblities[tile_index].count] = 1.0;
-    //out_color = vec4(illuminance, 1.0);
-    //out_color = vec4(abs(normal), 1.0);
-    //out_color = vec4(abs(texture(normal_sampler, frag_tex_coord).rgb), 1.0); // normal map debug view
 }
