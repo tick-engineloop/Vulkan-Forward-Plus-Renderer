@@ -147,7 +147,7 @@ bool isCollided(PointLight light, ViewFrustum frustum)
 
     // Step1: sphere-plane test
 	// 球-平面相交判断：判断球心到平面的距离是否大于球的半径，若大于则不相交，否则相交
-	// 点-平面距离：根据平面方程的海森法线形式，如果点是在平面法线指向的那一侧空间内，点面见的距离大于零；如果在另一侧那么点面距离小于零
+	// 点-平面距离：根据平面方程的海森法线形式，如果点是在平面法线指向的那一侧空间内，点面间的距离大于零；如果在另一侧那么点面距离小于零
 	for (int i = 0; i < 6; i++)
 	{
 		// 如果光源位置在视锥体平面外侧，并且距离平面大于光源半径，那么这个光源就对当前瓦片没有光照作用
@@ -180,7 +180,7 @@ bool isCollided(PointLight light, ViewFrustum frustum)
 void main()
 {
 	ivec2 tile_id = ivec2(gl_WorkGroupID.xy);
-	uint tile_index = tile_id.y * push_constants.tile_nums.x + tile_id.x;
+	uint tile_index = tile_id.y * push_constants.tile_nums.x + tile_id.x;   // 第几行瓦片 x 每行瓦片数量 + 该行第几个瓦片
 
 	// TODO: depth culling???
 
